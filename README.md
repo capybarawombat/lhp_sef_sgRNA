@@ -163,3 +163,12 @@ Large-scale foundation models justify our pipeline's direct processing of raw DN
 * **Evo 2 (Multi-Domain Upgrade)**: *Brixi et al. (2026) (Nature)*. The core engine of our framework:
   1. **Phase 0**: Supplies deep contextual, chromatin-accessibility, and genome-wide epigenetic embeddings for the condition vector.
   2. **Phase 3**: Serves as the global safety oracle, running zero-shot likelihood calculations across a 1-Mb genomic context to prove zero distal off-target risks.
+
+---
+
+## 📂 Extended Resource & Research Hub
+
+To facilitate peer review, scientific collaboration, and immediate access to the theoretical underpinnings of this research, we host a centralized document repository:
+
+* **🔬 Core Project Manuscript (Primary Paper)**: Access our complete research manuscript, methodology write-ups, and academic dissertation in the [Primary Manuscript Drive Folder](https://drive.google.com/drive/folders/1VaSAHPzLAhXsfAwKCRTUbEgZgtpL-SaO?usp=sharing).
+* **📚 Academic Reference Library (Downloaded Literature)**: A comprehensive local library of all cited foundational papers, including STRAND, gRNAde, sgDesigner, Evo 1 & 2, and biophysical references, available at the [Reference Library Drive Folder](https://drive.google.com/drive/folders/1Y5SrPMf3bMICmJhSJc4ndA1GOOXknqms?usp=sharing).
