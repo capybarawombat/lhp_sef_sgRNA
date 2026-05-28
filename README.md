@@ -60,6 +60,60 @@ flowchart TD
 
 ---
 
+## 📂 Repository Directory Structure
+
+```text
+CRISPR-GenAI-Pipeline/
+│
+├── .gitignore                   # Excludes large local datasets & model weights
+├── README.md                    # Detailed pipeline documentation & reference hub
+├── requirements.txt             # Python dependencies (PyTorch, PyG, transformers)
+│
+├── configs/                     # Hyperparameter & architecture configurations
+│   └── diffusion_config.json    # C-DDM model parameters (T=100, learning rate, CFG weight)
+│
+├── data/                        # Local data directory (excluded from version control)
+│   ├── raw/                     # Raw DNA/genomic datasets (Kaggle/HF downloads)
+│   └── processed/               # Tokenized inputs & condition embeddings
+│
+├── notebooks/                   # Jupyter Notebooks for visual analysis & live demos
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_cddm_latent_space.ipynb   # Latent space visualization of generated guides
+│   └── 03_pipeline_demo.ipynb       # End-to-end execution walkthrough for review
+│
+├── src/                         # Core execution modules
+│   ├── __init__.py
+│   │
+│   ├── data_loader/             # Genomic data ingestion & formatting
+│   │   ├── hf_download.py       # Auto-download from Hugging Face repositories
+│   │   └── preprocess.py        # Evo 2 & one-hot encoding feature mapping
+│   │
+│   ├── phase1_generator/        # Discrete D3PM Generative Engine
+│   │   ├── __init__.py
+│   │   ├── model_cddm.py        # PyTorch Discrete Denoising Diffusion architecture
+│   │   └── train.py             # Denoising Markov step training loops & CFG steering
+│   │
+│   ├── phase2_structure/        # 3D Conformational Filter
+│   │   ├── __init__.py
+│   │   ├── folding_3d.py        # 3D folding and backbone coordinate prediction (RhoFold)
+│   │   └── grnade_align.py      # Biophysical validation (RMSD & TM-score checks)
+│   │
+│   ├── phase3_oracles/          # Zero-Shot Safety & Efficacy Oracles
+│   │   ├── __init__.py
+│   │   ├── oracle_a_evo2.py     # Evo 2 40B zero-shot global off-target check (1-Mb)
+│   │   └── oracle_b_strand.py   # STRAND single-cell transcriptomic perturbation shifts
+│   │
+│   └── utils/                   # Shared pipeline utilities
+│       ├── metrics.py           # Precision, binding energy (L_Allele), and recovery rate
+│       └── visualization.py     # Epigenetic plots, loss curves, and 3D folding alignments
+│
+└── scripts/                     # Automated pipeline scripts
+    ├── run_training.sh
+    └── run_evaluation.sh
+```
+
+---
+
 ## 🔬 Operational Phase Deep-Dive
 
 ### 🧬 Phase 0: Multi-Modal Feature Extraction (The Conditioning Module)
