@@ -1,0 +1,7 @@
+{
+    "model_name": "C-DDM",
+    "timesteps": 100,
+    "learning_rate": 0.0001,
+    "cfg_weight": 0.5,
+    "thermodynamic_penalty_weight": 1.0
+}
