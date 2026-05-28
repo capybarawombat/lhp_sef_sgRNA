@@ -1,0 +1,19 @@
+# Cache & Compilation logs
+pycache/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+Kaggle API keys & Local Environments
+.env
+miniconda*/
+.venv/
+env/
+
+Deep Learning Model Weights & Output Data
+*.pt
+*.pth
+*.ckpt
+*.h5
+data/
+outputs/
