@@ -53,10 +53,16 @@ flowchart TD
     P1 ---> P2
     P2 ---> P3
 
+    %% Active Feedback Loop lines
+    OA -- "Fail: Off-Target Penalty Signal" -.-► P1
+    OB -- "Fail: Efficacy Reward Signal" -.-► P1
+
     style P0 fill:#101423,stroke:#3b82f6,stroke-width:2px,color:#f3f4f6
     style P1 fill:#101423,stroke:#10b981,stroke-width:2px,color:#f3f4f6
     style P2 fill:#101423,stroke:#f59e0b,stroke-width:2px,color:#f3f4f6
     style P3 fill:#101423,stroke:#8b5cf6,stroke-width:2px,color:#f3f4f6
+    linkStyle 7 stroke:#ef4444,stroke-width:2px,stroke-dasharray: 5 5;
+    linkStyle 8 stroke:#ef4444,stroke-width:2px,stroke-dasharray: 5 5;
 ```
 
 ---
@@ -92,6 +98,7 @@ CRISPR-GenAI-Pipeline/
 │   ├── phase1_generator/        # Discrete D3PM Generative Engine
 │   │   ├── __init__.py
 │   │   ├── model_cddm.py        # PyTorch Discrete Denoising Diffusion architecture
+│   │   ├── feedback_agent.py    # Offline RL constraint cache & feedback penalty loop
 │   │   └── train.py             # Denoising Markov step training loops & CFG steering
 │   │
 │   ├── phase2_structure/        # Hierarchical Structural Validation
@@ -138,9 +145,12 @@ CRISPR-GenAI-Pipeline/
   * Operates on a **Discrete Denoising Diffusion Probabilistic Model (D3PM)** using categorical Markov transition matrices rather than standard Gaussian noise.
   * Over $T$ timesteps (e.g., $T=100$), the neural network iteratively predicts reverse transition probabilities to "de-mutate" random noise back into a functional sgRNA.
 * **The Secret Weapon (Classifier-Free Guidance & Mismatch Engineering)**:
-  * At each timestep $t$, Classifier-Free Guidance (CFG) is modulated by a custom **Thermodynamic Penalty** ($\mathcal{L}_{\text{Allele}}$).
-  * The model evaluates the predicted candidate sequence's binding energy to both the Mutant Allele ($E_{\text{mutant}}$) and Healthy Wild-Type Allele ($E_{\text{wildtype}}$).
-  * The generation trajectory is mathematically steered *away* from wild-type binding, forcing the AI to engineer a specific compensatory mismatch. This results in a guide that cleaves the mutant (1 total mismatch) but thermodynamically detaches from the healthy allele (2 total mismatches).
+  - At each timestep $t$, Classifier-Free Guidance (CFG) is modulated by a custom **Thermodynamic Penalty** ($\mathcal{L}_{\text{Allele}}$).
+  - The model evaluates the predicted candidate sequence's binding energy to both the Mutant Allele ($E_{\text{mutant}}$) and Healthy Wild-Type Allele ($E_{\text{wildtype}}$).
+  - The generation trajectory is mathematically steered *away* from wild-type binding, forcing the AI to engineer a specific compensatory mismatch. This results in a guide that cleaves the mutant (1 total mismatch) but thermodynamically detaches from the healthy allele (2 total mismatches).
+* **Active Alignment Loop (Offline RL Fine-tuning)**:
+  - The generative diffusion model continuously receives penalty signals from the Phase 3 safety/efficacy oracles.
+  - Using offline policy optimization (such as reward-weighted conditional training or direct gradient penalties), the model updates its token probability space at each Markov denoising step $t$, mathematically deterring the C-DDM from generating nucleotide combinations that were previously rejected by the downstream validation engines.
 * **Output**: A batch of discrete, 20-nucleotide sgRNA sequence strings (e.g., `ACGUGC...`) optimized for absolute allele-specificity.
 
 ---
@@ -167,6 +177,10 @@ CRISPR-GenAI-Pipeline/
 * **The Dual Oracles**:
   * **Oracle A (Global Safety via Evo 2)**: The guide sequence is evaluated by the 40-Billion parameter Evo 2 model against a massive 1-million-base-pair context, calculating zero-shot log-likelihoods of cleavage to mathematically guarantee the absence of distal off-target mutations.
   * **Oracle B (Transcriptomic Efficacy via STRAND)**: Utilizes paired-control validation in the STRAND sequence-conditioned optimal transport model. By comparing single-cell transcriptomic shifts of mutant and wild-type cells, we mathematically verify a return to healthy expression in mutant cells with exactly 0.0% transcriptomic disruption in healthy cells.
+* **Closed-Loop Feedback Generation**:
+  - sgRNAs failing Evo 2 zero-shot off-target thresholds or STRAND transcriptomic recovery marks are programmatically labeled as **Negative Samples**.
+  - These failed candidates, alongside their associated numerical oracle penalty scores, are cached and routed back into the Phase 1 generator's training process.
+  - By applying an isolated penalty gradient relative to these cached sequences, the system self-evolves in a closed loop, constantly updating the generative space to bypass dangerous or inactive sub-sequences.
 * **Final Output**: A ranked, pharma-grade, clinically-ready sgRNA candidate scientifically proven to safely and selectively treat the target Autosomal Dominant disorder.
 
 ---
