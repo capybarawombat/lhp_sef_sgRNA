@@ -54,8 +54,8 @@ flowchart TD
     P2 ---> P3
 
     %% Active Feedback Loop lines
-    OA -- "Fail: Off-Target Penalty Signal" -.-> P1
-    OB -- "Fail: Efficacy Reward Signal" -.-> P1
+    OA -.->|Fail: Off-Target Penalty Signal| P1
+    OB -.->|Fail: Efficacy Reward Signal| P1
 
     style P0 fill:#101423,stroke:#3b82f6,stroke-width:2px,color:#f3f4f6
     style P1 fill:#101423,stroke:#10b981,stroke-width:2px,color:#f3f4f6
